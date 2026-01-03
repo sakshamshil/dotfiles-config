@@ -125,6 +125,9 @@ alias cd="z"
 alias clauded="claude --dangerously-skip-permissions"
 alias claudedr="claude --dangerously-skip-permissions --resume"
 alias claudedc="claude --dangerously-skip-permissions --continue"
+alias yupdate='sudo apt update && sudo apt upgrade -y'
+alias open='xdg-open'
+alias weather='curl wttr.in'
 eval "$(starship init bash)"
 
 export NVM_DIR="$HOME/.nvm"
