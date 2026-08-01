@@ -1,0 +1,83 @@
+[theme]
+name = "catppuccin"
+
+[terminal]
+new_cwd = "follow"
+
+[session]
+resume_agents_on_restore = true
+
+[keys]
+prefix = "ctrl+space"
+
+# reload (same muscle memory as tmux `prefix+r`)
+reload_config = "prefix+r"
+resize_mode = ""
+
+# splits match tmux bindings: \ = horizontal, - = vertical
+split_vertical = "prefix+\\"
+split_horizontal = "prefix+-"
+
+# pane nav (h/j/k/l already default, explicit for clarity)
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+
+# ── popup bindings (mirror your tmux C-g, C-r, etc.) ──
+
+[[keys.command]]
+key = "prefix+ctrl+g"
+type = "popup"
+command = "lazygit"
+description = "lazygit"
+width = "80%"
+height = "80%"
+
+[[keys.command]]
+key = "prefix+ctrl+r"
+type = "popup"
+command = "ranger"
+description = "ranger"
+width = "90%"
+height = "90%"
+
+[[keys.command]]
+key = "prefix+ctrl+p"
+type = "popup"
+command = "ipython"
+description = "ipython"
+width = "80%"
+height = "80%"
+
+[[keys.command]]
+key = "prefix+ctrl+t"
+type = "popup"
+command = "exec \"${SHELL:-sh}\""
+description = "floating shell"
+width = "75%"
+height = "75%"
+
+[[keys.command]]
+key = "prefix+ctrl+e"
+type = "popup"
+command = "nano ~/.bashrc"
+description = "edit .bashrc"
+width = "80%"
+height = "80%"
+
+[[keys.command]]
+key = "prefix+ctrl+j"
+type = "popup"
+command = '''herdr session list 2>/dev/null | fzf --reverse | xargs -r herdr session attach'''
+description = "switch session"
+width = "60%"
+height = "40%"
+
+[[keys.command]]
+key = "prefix+ctrl+n"
+type = "popup"
+command = '''bash -c 'read -p "Session name: " name; herdr session attach "$name" 2>/dev/null || herdr session attach "$name"; exec "${SHELL:-sh}"' '''
+description = "new session"
+width = "60%"
+height = "30%"

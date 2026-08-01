@@ -92,6 +92,44 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
+# Claude aliases
+alias clauded='claude --dangerously-skip-permissions'
+alias claudedr='claude --dangerously-skip-permissions --resume'
+alias claudedc='claude --dangerously-skip-permissions --continue'
+
+# Run Claude against the GLM-backed LiteLLM proxy (override per-session, default stays on Claude)
+claude-glm() {
+  ANTHROPIC_BASE_URL="https://litellm.veldev.com" \
+  ANTHROPIC_MODEL="glm-5-turbo" \
+  ANTHROPIC_DEFAULT_HAIKU_MODEL="qwen3-coder-30B" \
+  ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5-turbo" \
+  ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.2" \
+  API_TIMEOUT_MS="3000000" \
+  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1" \
+  CLAUDE_CODE_AUTO_COMPACT_WINDOW="180000" \
+  MAX_MCP_OUTPUT_TOKENS="20000" \
+  claude "$@"
+}
+
+clauded-glm() { claude-glm --dangerously-skip-permissions "$@"; }
+claudedr-glm() { claude-glm --dangerously-skip-permissions --resume "$@"; }
+claudedc-glm() { claude-glm --dangerously-skip-permissions --continue "$@"; }
+
+# Modern CLI replacements
+alias cat='batcat'
+alias ls='lsd'
+
+# WSL2 clipboard (replaces xclip)
+alias copy='clip.exe'
+alias paste="powershell.exe -command 'Get-Clipboard' | tr -d '\r'"
+
+# Utility aliases
+alias yupdate='sudo apt update && sudo apt upgrade -y'
+alias open='wslview'
+alias weather='curl wttr.in'
+alias gn='shutdown -h now'
+alias lg='lazygit'
+
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -115,26 +153,56 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-alias copy="xclip -selection clipboard"
-alias paste="xclip -selection clipboard -o"
-alias cat="batcat"
-alias ls="lsd"
-alias gn="shutdown -h now"
-eval "$(zoxide init bash)"
-alias cd="z"
-alias clauded="claude --dangerously-skip-permissions"
-alias claudedr="claude --dangerously-skip-permissions --resume"
-alias claudedc="claude --dangerously-skip-permissions --continue"
-alias yupdate='sudo apt update && sudo apt upgrade -y'
-alias open='xdg-open'
-alias weather='curl wttr.in'
-eval "$(starship init bash)"
 
 # Auto-start tmux on new terminal
 if command -v tmux &>/dev/null && [ -z "$TMUX" ]; then
-    tmux new-session
+    tmux attach 2>/dev/null || tmux new-session
 fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
+alias rm='trash'
+alias clearzones="find . -type f -name '*:Zone.Identifier' -delete"
+alias seezones="find . -type f -name '*:Zone.Identifier'"
+alias csr="ssh -i ~/.ssh/csr.pem velocity@192.168.10.131"
+alias c3m="ssh velocity@192.168.10.246"
+# Initialize zoxide
+eval "$(zoxide init bash)"
+
+alias cd='z'
+
+
+# CSR GCP Server Aliases (added 2025-12-18)
+alias csrapp="~/.local/bin/sshpass -p 'Velocity@tncsr1' ssh -o StrictHostKeyChecking=no velocity@10.40.0.2"
+alias csrdb="~/.local/bin/sshpass -p 'Velocity@tncsr1' ssh -o StrictHostKeyChecking=no velocity@10.40.0.4"
+stty -ixon
+
+# OpenCode Claude Code integration (wrapper at ~/.local/bin/opencode handles all opencode commands)
+# This bypasses the broken Claude Code plugin discovery and provides direct CLI access
+
+# Initialize fzf keybindings and completion
+[ -f /usr/share/doc/fzf/examples/key-bindings.bash ] && source /usr/share/doc/fzf/examples/key-bindings.bash
+[ -f /usr/share/doc/fzf/examples/completion.bash ] && source /usr/share/doc/fzf/examples/completion.bash
+
+# Initialize starship prompt
+eval "$(starship init bash)"
+export EYES_URL="http://another-set-of-eyes.koyeb.app"
+
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - bash)"
+eval "$(pyenv virtualenv-init -)"
+
+# Prepend wl-paste shim (Claude Code image paste fix for WSL2)
+export PATH="$HOME/.local/bin-prepend:$PATH"
+
+# VS Code `code` shim (WSL stopped appending Windows PATH; pin it explicitly)
+VSCODE_WIN_BIN="/mnt/c/Users/Saksham_Shil/AppData/Local/Programs/Microsoft VS Code/bin"
+case ":$PATH:" in
+  *":$VSCODE_WIN_BIN:"*) ;;
+  *) [ -x "$VSCODE_WIN_BIN/code" ] && export PATH="$VSCODE_WIN_BIN:$PATH" ;;
+esac
